@@ -5,7 +5,8 @@ AI-powered tab grouping for Firefox. Analyzes your open tabs and organizes them 
 ## Features
 
 - **One-click analysis** - click "Analyze Tabs" and get suggested groups instantly
-- **Multiple AI providers** - Claude, OpenAI, Gemini, or Ollama (fully local)
+- **Multiple AI providers** - Claude, OpenAI, Gemini, Z.AI, or Ollama (fully local)
+- **Live model discovery** - fetch the model list directly from your provider's account
 - **Native tab groups** - uses Firefox's built-in tab grouping API
 - **Zen browser support** - falls back to sorting tabs by group when native grouping isn't available
 - **Privacy-first** - no telemetry, no tracking, API keys stored locally only
@@ -24,6 +25,7 @@ AI-powered tab grouping for Firefox. Analyzes your open tabs and organizes them 
 | Claude | Haiku 4.5, Sonnet 4.5, Opus 4.6 | [API key](https://console.anthropic.com/) |
 | OpenAI | GPT-4o mini, GPT-4o, o3-mini | [API key](https://platform.openai.com/) |
 | Gemini | Gemini 2.0 Flash, 2.5 Flash, 2.5 Pro | [API key](https://aistudio.google.com/) |
+| Z.AI | GLM 5.3, GLM 5.2, GLM 4.7 Flash, or any model from your account | [API key](https://z.ai/) |
 | Ollama | Llama 3.2, Mistral, Qwen 2.5, Gemma 2, Phi-4, custom | [Ollama](https://ollama.com/) running on localhost |
 
 ## Privacy

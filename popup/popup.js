@@ -44,7 +44,7 @@ function hideStaleIndicator() {
   document.getElementById("stale-indicator").classList.add("hidden");
 }
 
-const PROVIDER_NAMES = { claude: "Claude", openai: "OpenAI", gemini: "Gemini", ollama: "Ollama" };
+const PROVIDER_NAMES = { claude: "Claude", openai: "OpenAI", gemini: "Gemini", zai: "Z.AI", ollama: "Ollama" };
 
 function formatModelName(model) {
   if (!model) return "";
@@ -54,19 +54,20 @@ function formatModelName(model) {
     .replace(/-preview.*$/, "")
     .replace(/^claude-/, "")
     .replace(/^gpt-/, "GPT-")
-    .replace(/^gemini-/, "Gemini ");
+    .replace(/^gemini-/, "Gemini ")
+    .replace(/^glm-/, "GLM-");
 }
 
 async function init() {
   const data = await browser.storage.local.get([
     "provider", "ollamaUrl",
-    "apiKey_claude", "apiKey_openai", "apiKey_gemini",
+    "apiKey_claude", "apiKey_openai", "apiKey_gemini", "apiKey_zai",
     "apiKey", // legacy fallback
-    "model_claude", "model_openai", "model_gemini", "model_ollama",
+    "model_claude", "model_openai", "model_gemini", "model_zai", "model_ollama",
     "model", // legacy fallback
   ]);
   const provider = data.provider || "claude";
-  const providerKeyMap = { claude: "apiKey_claude", openai: "apiKey_openai", gemini: "apiKey_gemini" };
+  const providerKeyMap = { claude: "apiKey_claude", openai: "apiKey_openai", gemini: "apiKey_gemini", zai: "apiKey_zai" };
   const apiKey = data[providerKeyMap[provider]] || data.apiKey || "";
   const configured = provider === "ollama" ? !!data.ollamaUrl : !!apiKey;
   if (!configured) {

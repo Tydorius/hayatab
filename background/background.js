@@ -52,8 +52,9 @@ browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 async function handleAnalyzeTabs() {
   const settings = await browser.storage.local.get([
     "provider", "cooldown", "lastAnalysisTime", "ollamaUrl",
-    "model_claude", "model_openai", "model_gemini", "model_ollama",
-    "apiKey_claude", "apiKey_openai", "apiKey_gemini",
+    "ollamaApiKeyRequired", "apiKey_ollama",
+    "model_claude", "model_openai", "model_gemini", "model_zai", "model_ollama",
+    "apiKey_claude", "apiKey_openai", "apiKey_gemini", "apiKey_zai",
     // Legacy fallback
     "apiKey", "model",
   ]);
@@ -61,7 +62,7 @@ async function handleAnalyzeTabs() {
   const provider = settings.provider || "claude";
 
   // Resolve per-provider API key and model
-  const providerKeyMap = { claude: "apiKey_claude", openai: "apiKey_openai", gemini: "apiKey_gemini" };
+  const providerKeyMap = { claude: "apiKey_claude", openai: "apiKey_openai", gemini: "apiKey_gemini", zai: "apiKey_zai" };
   settings.apiKey = settings[providerKeyMap[provider]] || settings.apiKey || "";
   settings.model = settings["model_" + provider] || settings.model || "";
 
@@ -293,6 +294,23 @@ async function callAPI(provider, settings, tabData) {
       };
       break;
     }
+    case "zai": {
+      url = "https://api.z.ai/api/paas/v4/chat/completions";
+      headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      };
+      body = {
+        model: model || "glm-5.3",
+        // GLM thinking models emit reasoning tokens before the JSON answer
+        max_tokens: 4096,
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: userMessage },
+        ],
+      };
+      break;
+    }
     case "ollama": {
       const rawUrl = ollamaUrl || "http://localhost:11434";
       let parsedBase;
@@ -307,6 +325,10 @@ async function callAPI(provider, settings, tabData) {
       const base = rawUrl.replace(/\/$/, "");
       url = `${base}/api/chat`;
       headers = { "Content-Type": "application/json" };
+      // Attach Bearer auth only when the user opted in via settings
+      if (settings.ollamaApiKeyRequired && settings.apiKey_ollama) {
+        headers.Authorization = `Bearer ${settings.apiKey_ollama}`;
+      }
       body = {
         model: model || "llama3.2",
         stream: false,
@@ -369,6 +391,7 @@ function extractText(provider, apiResponse) {
   let text;
   switch (provider) {
     case "openai":
+    case "zai":
       text = apiResponse.choices?.[0]?.message?.content;
       break;
     case "gemini":
